@@ -115,6 +115,89 @@
     .whatsapp-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(37,211,102,0.45); }
     .whatsapp-btn:active { transform: scale(0.97); }
     .whatsapp-icon { font-size: 1.3rem; }
+      /* ===== DAILY TRACKER STYLES ===== */
+    .prayer-card { position: relative; overflow: hidden; }
+    .prayer-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,128,171,0.1), rgba(245,0,87,0.05));
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: inherit;
+    }
+    .prayer-card:hover::before { opacity: 1; }
+    .prayer-card:active { transform: scale(0.95) !important; }
+    .prayer-card.done {
+      background: linear-gradient(135deg, rgba(255,128,171,0.2), rgba(245,0,87,0.1)) !important;
+      border-color: #f50057 !important;
+      box-shadow: 0 4px 15px rgba(245,0,87,0.2) !important;
+    }
+    .prayer-card.done .check-icon {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .task-item { position: relative; overflow: hidden; }
+    .task-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,128,171,0.05), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .task-item:hover::before { opacity: 1; }
+    .task-item.done-task {
+      background: rgba(255,128,171,0.1) !important;
+      border-color: rgba(245,0,87,0.3) !important;
+    }
+
+    .mood-select-btn { position: relative; overflow: hidden; }
+    .mood-select-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff80ab, #f50057);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+      border-radius: 0 0 10px 10px;
+    }
+    .mood-select-btn:hover::after { transform: scaleX(1); }
+    .mood-select-btn.selected {
+      background: linear-gradient(135deg, #ff80ab, #f50057) !important;
+      border-color: #f50057 !important;
+      color: white !important;
+      box-shadow: 0 6px 20px rgba(245,0,87,0.3) !important;
+      transform: scale(1.05);
+    }
+    .mood-select-btn.selected span:last-child { color: white !important; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeInUp 0.6s ease forwards; }
+
+    #tracker-progress-fill { position: relative; overflow: hidden; }
+    #tracker-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
   </style>
 </head>
 <body class="min-h-screen pb-24 relative select-none">
@@ -369,6 +452,204 @@
     </div>
   </div>
 
+  
+  <!-- ===== INTERACTIVE DAILY TRACKER & REPORT ===== -->
+  <section id="daily-tracker" class="max-w-md mx-auto my-8 px-4">
+    <div class="glass rounded-3xl p-6 shadow-xl border-pink-300 overflow-hidden relative">
+      <div class="absolute top-2 left-4 text-4xl opacity-10 pointer-events-none">💕</div>
+      <div class="absolute bottom-4 right-4 text-3xl opacity-10 pointer-events-none">💖</div>
+
+      <div class="text-center mb-5">
+        <h2 class="text-2xl font-black text-pink-800 mb-1">📋 متابعتي اليومية</h2>
+        <p class="text-sm text-pink-600 font-bold">يومك معايا يا أحلى بنوته ✨</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-bold text-pink-800">نسبة إنجاز يومك</span>
+          <span class="text-xs font-black text-pink-700 bg-pink-100 px-3 py-1 rounded-xl" id="tracker-progress-text">0%</span>
+        </div>
+        <div class="w-full h-5 bg-white/40 rounded-full overflow-hidden border border-pink-200 shadow-inner relative">
+          <div id="tracker-progress-fill" class="h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2" style="width: 0%; background: linear-gradient(90deg, #ff80ab, #f50057, #c2185b); box-shadow: 0 2px 10px rgba(233,30,99,0.3);">
+            <span class="text-[10px] font-black text-white drop-shadow">❤️</span>
+          </div>
+        </div>
+        <div id="tracker-message" class="mt-3 text-center text-sm font-bold text-pink-700 bg-white/40 rounded-xl p-3 border border-pink-100 transition-all duration-500">
+          🌸 ابدئي يومك يا قلبي وعلمي اللي خلصتي
+        </div>
+      </div>
+
+      <!-- Prayer Cards -->
+      <div class="mb-5">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <h3 class="text-lg font-black text-pink-800 flex items-center gap-2">
+            🕌 الصلوات
+          </h3>
+          <span class="text-xs font-bold text-pink-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-100">
+            ✨ أهم حاجة الصلاة في وقتها يبنوتي
+          </span>
+        </div>
+        <div class="grid grid-cols-5 gap-2" id="prayer-grid">
+          <button class="prayer-card group relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-pink-200 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:shadow-lg" data-prayer="fajr" onclick="togglePrayer(this, 'fajr')">
+            <span class="text-xl mb-1 transition-transform duration-300 group-hover:scale-110">🌙</span>
+            <span class="text-xs font-black text-pink-800">الفجر</span>
+            <div class="check-icon absolute top-1 left-1 w-5 h-5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 scale-0 transition-all duration-300 shadow-md">✓</div>
+          </button>
+          <button class="prayer-card group relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-pink-200 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:shadow-lg" data-prayer="zuhr" onclick="togglePrayer(this, 'zuhr')">
+            <span class="text-xl mb-1 transition-transform duration-300 group-hover:scale-110">☀️</span>
+            <span class="text-xs font-black text-pink-800">الظهر</span>
+            <div class="check-icon absolute top-1 left-1 w-5 h-5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 scale-0 transition-all duration-300 shadow-md">✓</div>
+          </button>
+          <button class="prayer-card group relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-pink-200 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:shadow-lg" data-prayer="asr" onclick="togglePrayer(this, 'asr')">
+            <span class="text-xl mb-1 transition-transform duration-300 group-hover:scale-110">🌤️</span>
+            <span class="text-xs font-black text-pink-800">العصر</span>
+            <div class="check-icon absolute top-1 left-1 w-5 h-5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 scale-0 transition-all duration-300 shadow-md">✓</div>
+          </button>
+          <button class="prayer-card group relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-pink-200 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:shadow-lg" data-prayer="maghrib" onclick="togglePrayer(this, 'maghrib')">
+            <span class="text-xl mb-1 transition-transform duration-300 group-hover:scale-110">🌅</span>
+            <span class="text-xs font-black text-pink-800">المغرب</span>
+            <div class="check-icon absolute top-1 left-1 w-5 h-5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 scale-0 transition-all duration-300 shadow-md">✓</div>
+          </button>
+          <button class="prayer-card group relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-pink-200 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:shadow-lg" data-prayer="isha" onclick="togglePrayer(this, 'isha')">
+            <span class="text-xl mb-1 transition-transform duration-300 group-hover:scale-110">⭐</span>
+            <span class="text-xs font-black text-pink-800">العشاء</span>
+            <div class="check-icon absolute top-1 left-1 w-5 h-5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 scale-0 transition-all duration-300 shadow-md">✓</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Personal Tasks -->
+      <div class="mb-5">
+        <h3 class="text-lg font-black text-pink-800 mb-3 flex items-center gap-2">
+          📝 مهامك اليوم
+        </h3>
+        <div class="space-y-2" id="tasks-list">
+          <label class="task-item flex items-center gap-3 p-3 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-white/60 hover:border-pink-300 hover:shadow-md group" onclick="toggleTask(this, 'quran')">
+            <div class="relative w-6 h-6 flex-shrink-0 pointer-events-none">
+              <div class="task-check-visual w-6 h-6 rounded-lg border-2 border-pink-300 bg-white/80 transition-all duration-300 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+            </div>
+            <span class="text-sm font-bold text-pink-800 group-hover:text-pink-900 transition-colors pointer-events-none">📖 قرأت قرآن؟</span>
+          </label>
+          <label class="task-item flex items-center gap-3 p-3 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-white/60 hover:border-pink-300 hover:shadow-md group" onclick="toggleTask(this, 'azkar')">
+            <div class="relative w-6 h-6 flex-shrink-0 pointer-events-none">
+              <div class="task-check-visual w-6 h-6 rounded-lg border-2 border-pink-300 bg-white/80 transition-all duration-300 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+            </div>
+            <span class="text-sm font-bold text-pink-800 group-hover:text-pink-900 transition-colors pointer-events-none">🤲 قرأت الأذكار </span>
+          </label>
+          <label class="task-item flex items-center gap-3 p-3 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-white/60 hover:border-pink-300 hover:shadow-md group" onclick="toggleTask(this, 'cooking')">
+            <div class="relative w-6 h-6 flex-shrink-0 pointer-events-none">
+              <div class="task-check-visual w-6 h-6 rounded-lg border-2 border-pink-300 bg-white/80 transition-all duration-300 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+            </div>
+            <span class="text-sm font-bold text-pink-800 group-hover:text-pink-900 transition-colors pointer-events-none">👩‍🍳 طبختِ اليوم؟</span>
+          </label>
+          <label class="task-item flex items-center gap-3 p-3 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-white/60 hover:border-pink-300 hover:shadow-md group" onclick="toggleTask(this, 'cleaning')">
+            <div class="relative w-6 h-6 flex-shrink-0 pointer-events-none">
+              <div class="task-check-visual w-6 h-6 rounded-lg border-2 border-pink-300 bg-white/80 transition-all duration-300 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+            </div>
+            <span class="text-sm font-bold text-pink-800 group-hover:text-pink-900 transition-colors pointer-events-none">🧹 نضفتِ البيت؟</span>
+          </label>
+          <label class="task-item flex items-center gap-3 p-3 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-white/60 hover:border-pink-300 hover:shadow-md group" onclick="toggleTask(this, 'water')">
+            <div class="relative w-6 h-6 flex-shrink-0 pointer-events-none">
+              <div class="task-check-visual w-6 h-6 rounded-lg border-2 border-pink-300 bg-white/80 transition-all duration-300 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+            </div>
+            <span class="text-sm font-bold text-pink-800 group-hover:text-pink-900 transition-colors pointer-events-none">💧 شربتِ مية كفاية؟</span>
+          </label>
+        </div>
+      </div>
+<!-- تحت عنصر شربت مية كفاية مباشرة وبدون div محيط به وحدُه -->
+<label class="task-item flex items-center gap-3 p-3 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-white/60 hover:border-pink-300 hover:shadow-md group" onclick="toggleTask(this, 'sleep')">
+  <div class="relative w-6 h-6 flex-shrink-0 pointer-events-none">
+    <div class="task-check-visual w-6 h-6 rounded-lg border-2 border-pink-300 bg-white/80 transition-all duration-300 flex items-center justify-center">
+      <svg class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+    </div>
+  </div>
+  <span class="text-sm font-bold text-pink-800 group-hover:text-pink-900 transition-colors pointer-events-none">😴 نمتِ كويس النهاردة يمزتي؟</span>
+</label>
+      <!-- Mood Selector -->
+      <div class="mb-5">
+        <h3 class="text-lg font-black text-pink-800 mb-3 flex items-center gap-2">
+          😊 حالتك المزاجية
+        </h3>
+        <div class="grid grid-cols-4 gap-2" id="mood-selector-grid">
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="happy" onclick="selectMood(this, 'happy')">
+            <span class="text-2xl mb-1">😊</span>
+            <span class="text-[10px] font-bold text-pink-700">سعيدة</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="calm" onclick="selectMood(this, 'calm')">
+            <span class="text-2xl mb-1">😌</span>
+            <span class="text-[10px] font-bold text-pink-700">هادية</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="tired" onclick="selectMood(this, 'tired')">
+            <span class="text-2xl mb-1">😴</span>
+            <span class="text-[10px] font-bold text-pink-700">تعبانة</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="sad" onclick="selectMood(this, 'sad')">
+            <span class="text-2xl mb-1">😢</span>
+            <span class="text-[10px] font-bold text-pink-700">زعلانة</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="excited" onclick="selectMood(this, 'excited')">
+            <span class="text-2xl mb-1">🤩</span>
+            <span class="text-[10px] font-bold text-pink-700">متحمسة</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="loved" onclick="selectMood(this, 'loved')">
+            <span class="text-2xl mb-1">🥰</span>
+            <span class="text-[10px] font-bold text-pink-700">محبوبة</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="angry" onclick="selectMood(this, 'angry')">
+            <span class="text-2xl mb-1">😤</span>
+            <span class="text-[10px] font-bold text-pink-700">متعصبة</span>
+          </button>
+          <button class="mood-select-btn flex flex-col items-center p-2 rounded-xl border-2 border-pink-100 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-pink-400 hover:bg-white/70" data-mood="miss" onclick="selectMood(this, 'miss')">
+            <span class="text-2xl mb-1">💖</span>
+            <span class="text-[10px] font-bold text-pink-700">وحشتني</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Daily Notes -->
+      <div class="mb-5">
+        <h3 class="text-lg font-black text-pink-800 mb-3 flex items-center gap-2">
+          📝 تفاصيل يومي
+        </h3>
+        <textarea id="daily-notes" rows="4" placeholder="اكتبي هنا كل حاجة حصلت النهاردة يا حبيبتي..." 
+          class="w-full p-4 rounded-2xl border-2 border-pink-200 bg-white/50 backdrop-blur-sm text-pink-800 text-sm font-bold placeholder-pink-300 focus:outline-none focus:border-pink-500 focus:bg-white/70 transition-all duration-300 resize-none"
+          style="font-family: 'Tajawal', sans-serif;"></textarea>
+      </div>
+
+      <!-- Reward Section (Hidden until 100%) -->
+      <div id="reward-section" class="hidden mb-5 overflow-hidden">
+        <div class="p-4 rounded-2xl border-2 border-dashed border-pink-400 bg-gradient-to-br from-pink-50/80 to-rose-50/80 backdrop-blur-sm relative overflow-hidden">
+          <div class="absolute -top-2 -right-2 text-4xl opacity-20">🎁</div>
+          <h3 class="text-lg font-black text-pink-800 mb-2 flex items-center gap-2">
+            🎁 اختاري مكافأتك!
+          </h3>
+          <p class="text-xs font-bold text-pink-600 mb-3">كملتي 100% يا اشطر بنوته! اكتبي اللي نفسك فيه 👇</p>
+          <input type="text" id="reward-input" placeholder="اكتبي مكافأتك هنا يا قلبي..." 
+            class="w-full p-3 rounded-xl border-2 border-pink-300 bg-white/70 text-pink-800 text-sm font-bold placeholder-pink-300 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-300"
+            style="font-family: 'Tajawal', sans-serif;">
+        </div>
+      </div>
+
+      <!-- Send Report Button -->
+      <button id="send-report-btn" onclick="sendDailyReport()" 
+        class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white font-black text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 border-2 border-white/30 flex items-center justify-center gap-2">
+        <span>📤 إرسال التقرير اليومي</span>
+        <span class="text-xl">💌</span>
+      </button>
+    </div>
+  </section>
+
   <!-- SPOTIFY MUSIC SECTION -->
   <section class="max-w-md mx-auto my-8 px-4 space-y-6">
     <h2 class="text-xl font-bold text-center text-pink-900">🎵 أغانينا على Spotify</h2>
@@ -424,22 +705,26 @@
   </div>
 
   <script>
-    // ===== COUNTER =====
-    const now = new Date();
-    const startDate = new Date(now.getTime() - (8.25 * 365.25 * 24 * 60 * 60 * 1000));
+    // ===== FIXED COUNTER (Real-time accurate calculation) =====
+    const startDate = new Date(new Date().getTime() - (8.4166666667 * 365.25 * 24 * 60 * 60 * 1000));
+
     function updateCounter() {
       const current = new Date();
-      let years = current.getFullYear() - startDate.getFullYear();
-      let months = current.getMonth() - startDate.getMonth();
-      let days = current.getDate() - startDate.getDate();
-      if (days < 0) { months--; const prevMonth = new Date(current.getFullYear(), current.getMonth(), 0); days += prevMonth.getDate(); }
-      if (months < 0) { years--; months += 12; }
-      let hours = current.getHours() - startDate.getHours();
-      let minutes = current.getMinutes() - startDate.getMinutes();
-      let seconds = current.getSeconds() - startDate.getSeconds();
-      if (seconds < 0) { minutes--; seconds += 60; }
-      if (minutes < 0) { hours--; minutes += 60; }
-      if (hours < 0) { days--; hours += 24; }
+      const diffMs = current.getTime() - startDate.getTime();
+
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const seconds = totalSeconds % 60;
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const minutes = totalMinutes % 60;
+      const totalHours = Math.floor(totalMinutes / 60);
+      const hours = totalHours % 24;
+      const totalDays = Math.floor(totalHours / 24);
+
+      const years = Math.floor(totalDays / 365.25);
+      const remainingDaysAfterYears = totalDays - Math.floor(years * 365.25);
+      const months = Math.floor(remainingDaysAfterYears / 30.44);
+      const days = Math.floor(remainingDaysAfterYears - (months * 30.44));
+
       document.getElementById('years').textContent = years;
       document.getElementById('months').textContent = months;
       document.getElementById('days').textContent = days;
@@ -728,6 +1013,210 @@ function addKiss(e) {
       // Light confetti
       confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 }, colors: ['#e91e63', '#f50057', '#ff80ab', '#ffd700', '#ffffff'] });
     }
+  
+
+    // ===== DAILY TRACKER =====
+    const TRACKER_STORAGE_KEY = 'lolitaa_daily_tracker';
+    const TRACKER_DATE_KEY = 'lolitaa_tracker_date';
+
+    const prayerNames = { fajr: 'الفجر', zuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
+    const taskNames = { quran: 'قرأتي قرآن', azkar: 'الأذكار', cooking: 'طبختِ اليوم', cleaning: 'نضفتِ البيت', water: 'شربتِ مية كفاية' };
+    const moodNames = { happy: 'سعيدة 😊', calm: 'هادية 😌', tired: 'تعبانة 😴', sad: 'زعلانة 😢', excited: 'متحمسة 🤩', loved: 'محبوبة 🥰', angry: 'متعصبة 😤', miss: 'وحشتني 💖' };
+
+    const progressMessages = [
+      { min: 0, max: 20, msg: 'مالك يبابا يومك مش مظبوط ليه تعالا كلمني نظبط الدنيا سوا وحشتني اصلا 🥹❤️' },
+      { min: 20, max: 40, msg: 'اشطر ملبن فحياتي لافيو يعمري مفاجأة حلوة لو خلصت كله 🤍✨' },
+      { min: 40, max: 60, msg: 'ايه الشطاره دي يحبيب عيوني انت عاوز تتباس شكلك تعالا هات حضن 🥺🫂' },
+      { min: 60, max: 80, msg: 'عاش يبطلي يلا قربنا نخلص بحبك موت 🤏❤️' },
+      { min: 80, max: 100, msg: 'برافو يبنوتي بيج هاج وبوسه لأشطر مزه فحياتي 🫂💋' },
+      { min: 100, max: 101, msg: 'اشطر كتكوت فعمري كله بحبك جدا ❤️✨' }
+    ];
+
+    let trackerData = { prayers: {}, tasks: {}, mood: null, notes: '', reward: '', confettiShown: false };
+
+    function checkAndResetTracker() {
+      const savedDate = localStorage.getItem(TRACKER_DATE_KEY);
+      const today = new Date().toDateString();
+      if (savedDate !== today) {
+        trackerData = { prayers: {}, tasks: {}, mood: null, notes: '', reward: '', confettiShown: false };
+        localStorage.setItem(TRACKER_DATE_KEY, today);
+        saveTracker();
+      } else {
+        const saved = localStorage.getItem(TRACKER_STORAGE_KEY);
+        if (saved) { try { trackerData = JSON.parse(saved); } catch(e) {} }
+      }
+    }
+
+    function saveTracker() {
+      localStorage.setItem(TRACKER_STORAGE_KEY, JSON.stringify(trackerData));
+    }
+
+    function updateProgress() {
+      const totalItems = 10;
+      let completed = 0;
+      Object.values(trackerData.prayers).forEach(d => { if (d) completed++; });
+      Object.values(trackerData.tasks).forEach(d => { if (d) completed++; });
+      const percent = Math.round((completed / totalItems) * 100);
+
+      document.getElementById('tracker-progress-fill').style.width = percent + '%';
+      document.getElementById('tracker-progress-text').textContent = percent + '%';
+
+      let message = progressMessages.find(m => percent >= m.min && percent < m.max)?.msg || progressMessages[0].msg;
+      if (percent === 100) message = progressMessages.find(m => m.min === 100)?.msg || message;
+      document.getElementById('tracker-message').textContent = message;
+
+      const rewardSection = document.getElementById('reward-section');
+      if (percent === 100) {
+        rewardSection.classList.remove('hidden');
+        rewardSection.classList.add('animate-fade-in');
+        if (!trackerData.confettiShown) {
+          trackerData.confettiShown = true;
+          saveTracker();
+          setTimeout(() => {
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#e91e63', '#f50057', '#ff80ab', '#ffd700', '#ffffff', '#ff4081'], shapes: ['circle', 'heart'], scalar: 1.2 });
+          }, 300);
+        }
+      } else {
+        rewardSection.classList.add('hidden');
+        trackerData.confettiShown = false;
+        saveTracker();
+      }
+    }
+
+    function togglePrayer(btn, prayer) {
+      const isDone = !trackerData.prayers[prayer];
+      trackerData.prayers[prayer] = isDone;
+      saveTracker();
+
+      if (isDone) {
+        btn.classList.add('done');
+        const rect = btn.getBoundingClientRect();
+        confetti({ particleCount: 20, spread: 40, origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight }, colors: ['#e91e63', '#f50057', '#ff80ab'], scalar: 0.8 });
+      } else {
+        btn.classList.remove('done');
+      }
+      updateProgress();
+    }
+
+    function toggleTask(label, task) {
+      const isDone = !trackerData.tasks[task];
+      trackerData.tasks[task] = isDone;
+      saveTracker();
+
+      const visual = label.querySelector('.task-check-visual');
+      const svg = visual.querySelector('svg');
+
+      if (isDone) {
+        label.classList.add('done-task');
+        visual.style.background = 'linear-gradient(135deg, #ff80ab, #f50057)';
+        visual.style.borderColor = '#f50057';
+        svg.style.opacity = '1';
+        const rect = label.getBoundingClientRect();
+        confetti({ particleCount: 15, spread: 30, origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight }, colors: ['#e91e63', '#ff80ab'], scalar: 0.7 });
+      } else {
+        label.classList.remove('done-task');
+        visual.style.background = '';
+        visual.style.borderColor = '';
+        svg.style.opacity = '0';
+      }
+      updateProgress();
+    }
+
+    function selectMood(btn, mood) {
+      document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      trackerData.mood = mood;
+      saveTracker();
+      const rect = btn.getBoundingClientRect();
+      confetti({ particleCount: 25, spread: 50, origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight }, colors: ['#ffd700', '#ff80ab', '#ffffff'], scalar: 0.9 });
+    }
+
+    function initTracker() {
+      checkAndResetTracker();
+
+      // Restore prayers
+      Object.keys(trackerData.prayers).forEach(p => {
+        if (trackerData.prayers[p]) {
+          const btn = document.querySelector('.prayer-card[data-prayer="' + p + '"]');
+          if (btn) btn.classList.add('done');
+        }
+      });
+
+      // Restore tasks
+      Object.keys(trackerData.tasks).forEach(t => {
+        if (trackerData.tasks[t]) {
+          const labels = document.querySelectorAll('.task-item');
+          labels.forEach(lbl => {
+            const onclick = lbl.getAttribute('onclick');
+            if (onclick && onclick.includes("'" + t + "'")) {
+              lbl.classList.add('done-task');
+              const visual = lbl.querySelector('.task-check-visual');
+              const svg = visual.querySelector('svg');
+              visual.style.background = 'linear-gradient(135deg, #ff80ab, #f50057)';
+              visual.style.borderColor = '#f50057';
+              svg.style.opacity = '1';
+            }
+          });
+        }
+      });
+
+      // Restore mood
+      if (trackerData.mood) {
+        const btn = document.querySelector('.mood-select-btn[data-mood="' + trackerData.mood + '"]');
+        if (btn) btn.classList.add('selected');
+      }
+
+      // Restore notes
+      if (trackerData.notes) document.getElementById('daily-notes').value = trackerData.notes;
+      if (trackerData.reward) document.getElementById('reward-input').value = trackerData.reward;
+
+      // Setup listeners
+      document.getElementById('daily-notes').addEventListener('input', function() {
+        trackerData.notes = this.value;
+        saveTracker();
+      });
+      document.getElementById('reward-input').addEventListener('input', function() {
+        trackerData.reward = this.value;
+        saveTracker();
+      });
+
+      updateProgress();
+    }
+
+    function sendDailyReport() {
+      const prayersList = Object.entries(trackerData.prayers).filter(([_, d]) => d).map(([k, _]) => prayerNames[k]).join(' ✅ ');
+      const tasksList = Object.entries(trackerData.tasks).filter(([_, d]) => d).map(([k, _]) => taskNames[k]).join(' ✅ ');
+      const moodText = trackerData.mood ? moodNames[trackerData.mood] : 'محددتش 😊';
+
+      let completed = 0;
+      Object.values(trackerData.prayers).forEach(d => { if (d) completed++; });
+      Object.values(trackerData.tasks).forEach(d => { if (d) completed++; });
+      const percent = Math.round((completed / 10) * 100);
+
+      let message = progressMessages.find(m => percent >= m.min && percent < m.max)?.msg || progressMessages[0].msg;
+      if (percent === 100) message = progressMessages.find(m => m.min === 100)?.msg || message;
+
+      let report = '📋 *تفاصيل يومي يحبيبي* 💕\n\n';
+      report += '📅 *التاريخ:* ' + new Date().toLocaleDateString('ar-EG') + '\n';
+      report += '📊 *نسبة الإنجاز:* ' + percent + '%\n\n';
+      report += '🕌 *الصلوات:*\n' + (prayersList ? '✅ ' + prayersList : '⬜ لسه مكتملتش') + '\n\n';
+      report += '📝 *المهام:*\n' + (tasksList ? '✅ ' + tasksList : '⬜ لسه مكتملتش') + '\n\n';
+      report += '😊 *حالتك المزاجية:* ' + moodText + '\n\n';
+      if (trackerData.notes.trim()) report += '📝 *تفاصيل يومك:*\n' + trackerData.notes + '\n\n';
+      report += '💬 *رسالتي ليكي يبطلي:*\n' + message + '\n\n';
+      if (percent === 100 && trackerData.reward.trim()) report += '🎁 *مكافأتك:* ' + trackerData.reward + '\n\n';
+      report += '*بحبك يا أحلى بنوته في الدنيا* ❤️✨';
+
+      window.open('https://wa.me/201060507203?text=' + encodeURIComponent(report), '_blank');
+    }
+
+    // Initialize tracker when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTracker);
+    } else {
+      initTracker();
+    }
+
   </script>
 </body>
 </html>
